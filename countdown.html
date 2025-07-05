@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aamna's Magical Birthday Countdown</title>
+<style>
+  /* Background gradient */
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 30px;
+  }
+
+  /* Floating stars container */
+  #stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
+  }
+
+  /* Individual star style */
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 6px white);
+    opacity: 0.8;
+    animation: twinkle 3s infinite alternate;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+
+  /* Main countdown container */
+  .countdown-wrapper {
+    position: relative;
+    z-index: 3;
+    max-width: 600px;
+    background: rgba(255 255 255 / 0.05);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow:
+      0 0 10px #8a2be2,
+      0 0 30px #7b68ee;
+    backdrop-filter: blur(12px);
+  }
+
+  /* Countdown heading */
+  h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: #f8b500;
+    background: linear-gradient(45deg, #ffafbd, #ffc3a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+      0 0 5px #ffafbd,
+      0 0 10px #ffafbd,
+      0 0 20px #ffafbd,
+      0 0 40px #ffafbd;
+    animation: glowPulse 4s ease-in-out infinite;
+    user-select: none;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      text-shadow:
+        0 0 5px #ffafbd,
+        0 0 10px #ffafbd,
+        0 0 20px #ffafbd,
+        0 0 40px #ffafbd;
+    }
+    50% {
+      text-shadow:
+        0 0 10px #ffd7d9,
+        0 0 20px #ffd7d9,
+        0 0 40px #ffd7d9,
+        0 0 80px #ffd7d9;
+    }
+  }
+
+  /* Countdown numbers container */
+  .countdown {
+    display: flex;
+    justify-content: space-around;
+    font-size: 2.5rem;
+    margin-top: 20px;
+    color: white;
+  }
+
+  /* Bounce animation for countdown numbers */
+  @keyframes bounceScale {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .countdown > div {
+    background: #6a11cb;
+    padding: 15px 25px;
+    border-radius: 15px;
+    box-shadow:
+      0 0 10px #6a11cb,
+      0 0 25px #2575fc inset;
+    min-width: 90px;
+    text-align: center;
+    font-weight: 700;
+    user-select: none;
+    animation: bounceScale 2.5s ease-in-out infinite;
+  }
+
+  .countdown div span.label {
+    display: block;
+    font-size: 1rem;
+    margin-top: 8px;
+    font-weight: normal;
+    color: #ccc;
+    text-transform: uppercase;
+  }
+
+  /* When countdown ends message */
+  #message {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #ff69b4;
+    text-shadow:
+      0 0 5px #ff69b4,
+      0 0 10px #ff69b4,
+      0 0 20px #ff1493,
+      0 0 40px #ff1493;
+    margin-top: 40px;
+    opacity: 0;
+    animation: appearMagical 3s forwards;
+    user-select: none;
+  }
+
+  @keyframes appearMagical {
+    0% {
+      opacity: 0;
+      transform: scale(0.7) rotate(-10deg);
+      filter: drop-shadow(0 0 10px #ff69b4);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1) rotate(5deg);
+      filter: drop-shadow(0 0 20px #ff69b4);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: drop-shadow(0 0 30px #ff69b4);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media(max-width: 480px) {
+    h1 {
+      font-size: 2.5rem;
+    }
+    .countdown {
+      font-size: 1.7rem;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .countdown > div {
+      min-width: 100%;
+    }
+  }
+
+  /* Confetti container */
+  #confetti-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 2;
+  }
+
+  /* Confetti piece */
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 14px;
+    background-color: red;
+    opacity: 0.85;
+    transform-origin: center;
+    border-radius: 2px;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+    animation-name: confettiFall, confettiSpin;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes confettiFall {
+    0% { top: -20px; opacity: 1; }
+    100% { top: 110vh; opacity: 0; }
+  }
+
+  @keyframes confettiSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Particle burst circle */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff69b4 0%, transparent 60%);
+    opacity: 0.9;
+    animation: particleBurstAnim 1.2s ease forwards;
+  }
+
+  @keyframes particleBurstAnim {
+    0% {
+      transform: scale(0);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="confetti-container"></div>
+
+<div class="countdown-wrapper">
+  <h1>Countdown to Aamna's Birthday</h1>
+  <div class="countdown" id="countdown">
+    <div>
+      <span id="days">00</span>
+      <span class="label">Days</span>
+    </div>
+    <div>
+      <span id="hours">00</span>
+      <span class="label">Hours</span>
+    </div>
+    <div>
+      <span id="minutes">00</span>
+      <span class="label">Minutes</span>
+    </div>
+    <div>
+      <span id="seconds">00</span>
+      <span class="label">Seconds</span>
+    </div>
+  </div>
+  <div id="message"></div>
+</div>
+
+<script>
+  // Target date: 17 July 2025 00:00:00
+  const targetDate = new Date('2025-07-17T00:00:00');
+
+  // Elements
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+  const countdownEl = document.getElementById('countdown');
+  const messageEl = document.getElementById('message');
+
+  // Floating stars setup
+  const starsContainer = document.getElementById('stars');
+
+  function randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function createStar() {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    const size = randomRange(1, 4);
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.top = Math.random() * window.innerHeight + 'px';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.animationDuration = (randomRange(2, 5)) + 's';
+    star.style.animationDelay = (Math.random()*5) + 's';
+
+    starsContainer.appendChild(star);
+
+    setTimeout(() => {
+      star.remove();
+      createStar();
+    }, 6000);
+  }
+  // Populate 60 stars initially
+  for(let i=0; i<60; i++) {
+    createStar();
+  }
+
+  // Confetti elements
+  const confettiContainer = document.getElementById('confetti-container');
+
+  // Generate confetti pieces with random colors and animation duration/delay
+  function createConfetti() {
+    const colors = ['#ff0a54', '#ff477e', '#ff85a1', '#fbb1b1', '#f9bec7', '#a70167'];
+    const confetti = document.createElement('div');
+    confetti.classList.add('confetti');
+    confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+
+    confetti.style.left = Math.random() * window.innerWidth + 'px';
+    confetti.style.width = (8 + Math.random()*6) + 'px';
+    confetti.style.height = (10 + Math.random()*8) + 'px';
+
+    confetti.style.animationDuration = (3 + Math.random()*3) + 's';
+    confetti.style.animationDelay = (Math.random()*5) + 's';
+
+    confetti.style.animation = `confettiFall ${confetti.style.animationDuration} linear ${confetti.style.animationDelay} infinite, confettiSpin 2s linear infinite`;
+
+    confettiContainer.appendChild(confetti);
+
+    setTimeout(() => {
+      if(confetti.parentNode) confetti.parentNode.removeChild(confetti);
+    }, 8000);
+  }
+
+  // Create multiple confetti pieces periodically
+  let confettiInterval = null;
+  function startConfetti() {
+    if(confettiInterval) return;
+    confettiInterval = setInterval(createConfetti, 150);
+  }
+  function stopConfetti() {
+    clearInterval(confettiInterval);
+    confettiInterval = null;
+  }
+
+  // Create particle burst around message element
+  function createParticleBurst(x, y, count = 25) {
+    for(let i=0; i<count; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+
+      particle.style.left = x + 'px';
+      particle.style.top = y + 'px';
+
+      const size = 5 + Math.random() * 8;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+
+      const angle = Math.random() * 2 * Math.PI;
+      const distance = 50 + Math.random() * 50;
+
+      particle.style.transition = 'transform 1.2s ease, opacity 1.2s ease';
+
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.style.transform = `translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px) scale(0)`;
+        particle.style.opacity = 0;
+      }, 10);
+
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 1300);
+    }
+  }
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      countdownEl.style.display = 'none';
+      messageEl.textContent = '🎉 Happy Birthday Aamna! 🎂';
+      messageEl.style.opacity = 1;
+      startConfetti();
+
+      const rect = messageEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width/2;
+      const centerY = rect.top + rect.height/2;
+      createParticleBurst(centerX, centerY, 40);
+
+      clearInterval(interval);
+      return;
+    }
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff / (1000*60*60)) % 24);
+    const minutes = Math.floor((diff / (1000*60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    daysEl.textContent = days.toString().padStart(2, '0');
+    hoursEl.textContent = hours.toString().padStart(2, '0');
+    minutesEl.textContent = minutes.toString().padStart(2, '0');
+    secondsEl.textContent = seconds.toString().padStart(2, '0');
+  }
+
+  // Update countdown every second
+  const interval = setInterval(updateCountdown, 1000);
+  updateCountdown();
+</script>
+
+</body>
+</html>
